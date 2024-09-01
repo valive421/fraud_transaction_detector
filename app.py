@@ -75,10 +75,7 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"⚠️ **Error:** {e}")
 
-st.markdown("""
-    ---
-    **Note:** This application uses a pre-trained model to detect anomalies. Always validate with domain experts.
-""")
+
 
         st.pyplot(fig)
     
