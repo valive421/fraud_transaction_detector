@@ -30,35 +30,56 @@ def classify_fraudulent_transactions(new_data: pd.DataFrame, model, scaler: Stan
     # Return the prediction
     return new_data
 
-st.title('Credit Card Fraud Detection')
+# Set custom style for Seaborn
+sns.set(style="whitegrid")
 
-uploaded_file = st.file_uploader("Upload an Excel file with credit card transactions", type="xlsx")
+st.title('🔍 Credit Card Fraud Detection')
+st.markdown("""
+    Detect fraudulent transactions with a trained Isolation Forest model. Upload your data and get insights immediately.
+""")
+
+# File uploader
+uploaded_file = st.file_uploader("📂 Upload an Excel file with credit card transactions", type="xlsx")
 
 if uploaded_file is not None:
     new_data = pd.read_excel(uploaded_file)
-    st.write("Uploaded Data:")
-    st.write(new_data.head())
+    st.write("📄 **Uploaded Data Preview**")
+    st.dataframe(new_data.head())
     
     try:
         results = classify_fraudulent_transactions(new_data, iso_forest, scaler)
-        st.write("Results with Fraudulent Column:")
-        st.write(results)
-        
-        # Visualizations
-        st.subheader("Distribution of Transaction Amounts")
-        fig, ax = plt.subplots()
-        sns.histplot(results[results['Fraudulent'] == 0]['Amount'], bins=50, kde=True, label='Non-Fraudulent', ax=ax)
-        sns.histplot(results[results['Fraudulent'] == 1]['Amount'], bins=50, kde=True, label='Fraudulent', ax=ax)
-        ax.set_title('Distribution of Transaction Amounts')
+        st.write("🔍 **Results with Fraudulent Column**")
+        st.dataframe(results)
+
+        # Visualizations with enhanced design
+        st.subheader("💰 Distribution of Transaction Amounts")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.histplot(results[results['Fraudulent'] == 0]['Amount'], bins=50, kde=True, label='Non-Fraudulent', color='green', ax=ax)
+        sns.histplot(results[results['Fraudulent'] == 1]['Amount'], bins=50, kde=True, label='Fraudulent', color='red', ax=ax)
+        ax.set_title('Distribution of Transaction Amounts', fontsize=16)
+        ax.set_xlabel('Transaction Amount', fontsize=14)
+        ax.set_ylabel('Frequency', fontsize=14)
         ax.legend()
         st.pyplot(fig)
         
-        st.subheader("Distribution of Time")
-        fig, ax = plt.subplots()
-        sns.histplot(results[results['Fraudulent'] == 0]['Time'], bins=50, kde=True, label='Non-Fraudulent', ax=ax)
-        sns.histplot(results[results['Fraudulent'] == 1]['Time'], bins=50, kde=True, label='Fraudulent', ax=ax)
-        ax.set_title('Distribution of Time')
+        st.subheader("⏰ Distribution of Transaction Time")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.histplot(results[results['Fraudulent'] == 0]['Time'], bins=50, kde=True, label='Non-Fraudulent', color='blue', ax=ax)
+        sns.histplot(results[results['Fraudulent'] == 1]['Time'], bins=50, kde=True, label='Fraudulent', color='orange', ax=ax)
+        ax.set_title('Distribution of Transaction Time', fontsize=16)
+        ax.set_xlabel('Transaction Time', fontsize=14)
+        ax.set_ylabel('Frequency', fontsize=14)
         ax.legend()
+        st.pyplot(fig)
+    
+    except Exception as e:
+        st.error(f"⚠️ **Error:** {e}")
+
+st.markdown("""
+    ---
+    **Note:** This application uses a pre-trained model to detect anomalies. Always validate with domain experts.
+""")
+
         st.pyplot(fig)
     
     except Exception as e:
