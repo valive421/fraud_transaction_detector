@@ -1,6 +1,6 @@
-from gettext import translation
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
@@ -44,18 +44,22 @@ if uploaded_file is not None:
         st.write("Results with Fraudulent Column:")
         st.write(results)
         
-        # Visualizations using Streamlit
+        # Visualizations
         st.subheader("Distribution of Transaction Amounts")
-        non_fraudulent_amounts = results[results['Fraudulent'] == 0]['Amount']
-        fraudulent_amounts = results[results['Fraudulent'] == 1]['Amount']
-        st.bar_chart(non_fraudulent_amounts, use_container_width=True, title='Non-Fraudulent Amounts')
-        st.bar_chart(fraudulent_amounts, use_container_width=True, title='Fraudulent Amounts')
+        fig, ax = plt.subplots()
+        sns.histplot(results[results['Fraudulent'] == 0]['Amount'], bins=50, kde=True, label='Non-Fraudulent', ax=ax)
+        sns.histplot(results[results['Fraudulent'] == 1]['Amount'], bins=50, kde=True, label='Fraudulent', ax=ax)
+        ax.set_title('Distribution of Transaction Amounts')
+        ax.legend()
+        st.pyplot(fig)
         
         st.subheader("Distribution of Time")
-        non_fraudulent_times = results[results['Fraudulent'] == 0]['Time']
-        fraudulent_times = results[results['Fraudulent'] == 1]['Time']
-        st.bar_chart(non_fraudulent_times, use_container_width=True, title='Non-Fraudulent Times')
-        st.bar_chart(fraudulent_times, use_container_width=True, title='Fraudulent Times')
+        fig, ax = plt.subplots()
+        sns.histplot(results[results['Fraudulent'] == 0]['Time'], bins=50, kde=True, label='Non-Fraudulent', ax=ax)
+        sns.histplot(results[results['Fraudulent'] == 1]['Time'], bins=50, kde=True, label='Fraudulent', ax=ax)
+        ax.set_title('Distribution of Time')
+        ax.legend()
+        st.pyplot(fig)
     
     except Exception as e:
         st.error(f"Error: {e}")
