@@ -1,7 +1,6 @@
 from gettext import translation
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
@@ -12,24 +11,23 @@ iso_forest = joblib.load('iso_forest_model.pkl')
 scaler = joblib.load('scaler.pkl') 
 
 def classify_fraudulent_transactions(new_data: pd.DataFrame, model, scaler: StandardScaler) -> pd.DataFrame:
-    #check if data is correct
+    # Check if data is correct
     if 'Amount' not in new_data.columns or 'Time' not in new_data.columns:
         raise ValueError("The dataset must include 'Amount' and 'Time' columns.")
     
-    #clean the data
-    object_columns=new_data.loc[:,new_data.dtypes=="object"].columns
-    for i in object_columns:
-        new_data[i] = pd.to_numeric(new_data[i], errors='coerce')
-    new_data.dropna(axis=0,inplace=True)
+    # Clean the data
+    object_columns = new_data.loc[:, new_data.dtypes == "object"].columns
+    for col in object_columns:
+        new_data[col] = pd.to_numeric(new_data[col], errors='coerce')
+    new_data.dropna(axis=0, inplace=True)
 
-
-    #scale the data as trained
+    # Scale the data as trained
     new_data[['Amount', 'Time']] = scaler.transform(new_data[['Amount', 'Time']])
-    #make predictions
+    # Make predictions
     predictions = model.predict(new_data)
-    #filtter fraud transactions
+    # Filter fraud transactions
     new_data['Fraudulent'] = [1 if x == -1 else 0 for x in predictions]
-    #return the prediction
+    # Return the prediction
     return new_data
 
 st.title('Credit Card Fraud Detection')
@@ -46,23 +44,18 @@ if uploaded_file is not None:
         st.write("Results with Fraudulent Column:")
         st.write(results)
         
-        # Visualizations
+        # Visualizations using Streamlit
         st.subheader("Distribution of Transaction Amounts")
-        fig, ax = plt.subplots()
-        sns.histplot(results[results['Fraudulent'] == 0]['Amount'], bins=50, kde=True, label='Non-Fraudulent', ax=ax)
-        sns.histplot(results[results['Fraudulent'] == 1]['Amount'], bins=50, kde=True, label='Fraudulent', ax=ax)
-        ax.set_title('Distribution of Transaction Amounts')
-        ax.legend()
-        st.pyplot(fig)
+        non_fraudulent_amounts = results[results['Fraudulent'] == 0]['Amount']
+        fraudulent_amounts = results[results['Fraudulent'] == 1]['Amount']
+        st.bar_chart(non_fraudulent_amounts, use_container_width=True, title='Non-Fraudulent Amounts')
+        st.bar_chart(fraudulent_amounts, use_container_width=True, title='Fraudulent Amounts')
         
         st.subheader("Distribution of Time")
-        fig, ax = plt.subplots()
-        sns.histplot(results[results['Fraudulent'] == 0]['Time'], bins=50, kde=True, label='Non-Fraudulent', ax=ax)
-        sns.histplot(results[results['Fraudulent'] == 1]['Time'], bins=50, kde=True, label='Fraudulent', ax=ax)
-        ax.set_title('Distribution of Time')
-        ax.legend()
-        st.pyplot(fig)
+        non_fraudulent_times = results[results['Fraudulent'] == 0]['Time']
+        fraudulent_times = results[results['Fraudulent'] == 1]['Time']
+        st.bar_chart(non_fraudulent_times, use_container_width=True, title='Non-Fraudulent Times')
+        st.bar_chart(fraudulent_times, use_container_width=True, title='Fraudulent Times')
     
     except Exception as e:
         st.error(f"Error: {e}")
-
