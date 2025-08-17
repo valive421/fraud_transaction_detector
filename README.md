@@ -52,7 +52,7 @@ scikit-learn
 numpy
 pandas
 joblib
-flask          # (if using API mode)
+flask          
 ```
 
 ---
@@ -161,5 +161,4 @@ fraud_transaction_detector/
 
 ---
 
-## 📜 License
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
